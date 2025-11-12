@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nx serve web",
     "build": "nx build web",
-    "test": "nx test web"
+    "test": "nx test web",
+    "preview": "nx preview web"
   },
   "private": true,
   "devDependencies": {
