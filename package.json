@@ -1,0 +1,48 @@
+{
+  "name": "@template-react-web/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nx serve web",
+    "build": "nx build web",
+    "test": "nx test web"
+  },
+  "private": true,
+  "devDependencies": {
+    "@nx/devkit": "22.0.3",
+    "@nx/js": "22.0.3",
+    "@nx/playwright": "22.0.3",
+    "@nx/react": "^22.0.3",
+    "@nx/vite": "22.0.3",
+    "@nx/web": "22.0.3",
+    "@nx/workspace": "22.0.3",
+    "@playwright/test": "^1.36.0",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/ui": "^3.0.0",
+    "autoprefixer": "10.4.13",
+    "jiti": "2.4.2",
+    "jsdom": "~22.1.0",
+    "nx": "22.0.3",
+    "postcss": "8.4.38",
+    "prettier": "^2.6.2",
+    "tailwindcss": "3.4.3",
+    "typescript": "~5.9.2",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.81.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "6.29.0"
+  }
+}
