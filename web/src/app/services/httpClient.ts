@@ -76,6 +76,16 @@ const createHttpClient = (baseUrl: string, authenticateByDefault: boolean) => {
     ) {
       return request<TResponse>(path, { ...options, method: 'POST', body });
     },
+    patch<TRequest, TResponse>(
+      path: string,
+      body: TRequest,
+      options?: Omit<RequestOptions, 'method' | 'body'>
+    ) {
+      return request<TResponse>(path, { ...options, method: 'PATCH', body });
+    },
+    delete<TResponse>(path: string, options?: Omit<RequestOptions, 'method'>) {
+      return request<TResponse>(path, { ...options, method: 'DELETE' });
+    },
   };
 };
 

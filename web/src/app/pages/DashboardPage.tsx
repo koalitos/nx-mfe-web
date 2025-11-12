@@ -1,4 +1,6 @@
+import { AdminPanel } from '../components/AdminPanel';
 import { MathForm } from '../components/MathForm';
+import { NavigationMenu } from '../components/NavigationMenu';
 import { RealtimeFeed } from '../components/RealtimeFeed';
 import { useAuth } from '../hooks/useAuth';
 
@@ -7,6 +9,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white">
+      <NavigationMenu className="mx-auto mb-6 w-full max-w-5xl" />
       <header className="mx-auto flex w-full max-w-5xl flex-col gap-4 rounded-xl border border-slate-800 bg-slate-900/70 p-6 shadow-lg shadow-black/40 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-wide text-emerald-300">
@@ -33,6 +36,10 @@ export const DashboardPage = () => {
         <MathForm />
         <RealtimeFeed />
       </main>
+
+      <section className="mx-auto mt-8 w-full max-w-5xl">
+        <AdminPanel />
+      </section>
     </div>
   );
 };

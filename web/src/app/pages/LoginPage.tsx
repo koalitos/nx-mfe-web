@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { HttpError } from '../services/httpClient';
+import { NavigationMenu } from '../components/NavigationMenu';
 
 export const LoginPage = () => {
   const { login, isProcessing } = useAuth();
@@ -38,8 +39,11 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col">
+        <NavigationMenu className="mb-6" />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
         <h1 className="text-2xl font-semibold text-white">Entrar</h1>
         <p className="mt-1 text-sm text-slate-300">
           Use sua conta criada via microservico em <code>/auth/login</code>.
@@ -94,6 +98,8 @@ export const LoginPage = () => {
             Cadastre-se
           </Link>
         </p>
+          </div>
+        </div>
       </div>
     </div>
   );

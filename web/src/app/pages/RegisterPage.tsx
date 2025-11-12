@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { HttpError } from '../services/httpClient';
+import { NavigationMenu } from '../components/NavigationMenu';
 
 export const RegisterPage = () => {
   const { register, isProcessing } = useAuth();
@@ -41,8 +42,11 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col">
+        <NavigationMenu className="mb-6" />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
         <h1 className="text-2xl font-semibold text-white">
           Criar conta
         </h1>
@@ -117,6 +121,8 @@ export const RegisterPage = () => {
             Fazer login
           </Link>
         </p>
+          </div>
+        </div>
       </div>
     </div>
   );
