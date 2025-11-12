@@ -6,6 +6,9 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => {
   const previewPort = Number(process.env.PORT ?? 4173);
+  const allowedHosts =
+    process.env.VITE_ALLOWED_HOSTS?.split(',').map((host) => host.trim()).filter(Boolean) ?? [];
+  allowedHosts.push('nx-mfe-web-production.up.railway.app');
 
   return {
     root: __dirname,
@@ -17,6 +20,7 @@ export default defineConfig(() => {
     preview: {
       port: previewPort,
       host: '0.0.0.0',
+      allowedHosts,
     },
     plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
     // Uncomment this if you are using workers.
