@@ -42,85 +42,89 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#090019] via-[#14042c] to-[#090019] p-6">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col">
-        <NavigationMenu className="mb-6" />
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40">
-        <h1 className="text-2xl font-semibold text-white">
-          Criar conta
-        </h1>
-        <p className="mt-1 text-sm text-slate-300">
-          Vamos chamar <code>/auth/register</code> na API de auth.
-        </p>
+          <div className="breathing-border w-full max-w-md space-y-6 rounded-2xl border border-[#4d1d88]/40 bg-[#1a0f2b]/90 p-8 shadow-[0_25px_120px_-15px_rgba(113,35,173,0.8)]">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#d3a6ff]">
+                Registro
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold text-white">
+                Criar conta
+              </h1>
+              <p className="mt-1 text-sm text-[#c5b5e9]">
+                Vamos chamar <code>/auth/register</code> na API de auth.
+              </p>
+            </div>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-200">Nome exibido</span>
-            <input
-              required
-              name="displayName"
-              value={form.displayName}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-            />
-          </label>
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <label className="block text-sm">
+                <span className="font-medium text-[#d7c7ff]">Nome exibido</span>
+                <input
+                  required
+                  name="displayName"
+                  value={form.displayName}
+                  onChange={handleChange}
+                  className="mt-1 w-full rounded-lg border border-[#4b1d7a] bg-[#140225]/80 p-3 text-white focus:border-[#a855f7] focus:outline-none focus:ring-2 focus:ring-[#a855f7]/40"
+                />
+              </label>
 
-          <label className="block text-sm">
-            <span className="font-medium text-slate-200">Email</span>
-            <input
-              required
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-            />
-          </label>
+              <label className="block text-sm">
+                <span className="font-medium text-[#d7c7ff]">Email</span>
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="mt-1 w-full rounded-lg border border-[#4b1d7a] bg-[#140225]/80 p-3 text-white focus:border-[#a855f7] focus:outline-none focus:ring-2 focus:ring-[#a855f7]/40"
+                />
+              </label>
 
-          <label className="block text-sm">
-            <span className="font-medium text-slate-200">Senha</span>
-            <input
-              required
-              type="password"
-              minLength={6}
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-            />
-          </label>
+              <label className="block text-sm">
+                <span className="font-medium text-[#d7c7ff]">Senha</span>
+                <input
+                  required
+                  type="password"
+                  minLength={6}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="mt-1 w-full rounded-lg border border-[#4b1d7a] bg-[#140225]/80 p-3 text-white focus:border-[#a855f7] focus:outline-none focus:ring-2 focus:ring-[#a855f7]/40"
+                />
+              </label>
 
-          <button
-            type="submit"
-            disabled={isProcessing}
-            className="w-full rounded-md bg-emerald-500 py-2 font-medium text-emerald-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-emerald-800 disabled:text-emerald-200"
-          >
-            {isProcessing ? 'Enviando...' : 'Cadastrar'}
-          </button>
-        </form>
+              <button
+                type="submit"
+                disabled={isProcessing}
+                className="w-full rounded-lg bg-gradient-to-r from-[#a855f7] via-[#9333ea] to-[#7e22ce] py-2.5 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isProcessing ? 'Enviando...' : 'Cadastrar'}
+              </button>
+            </form>
 
-        {error && (
-          <p
-            role="alert"
-            className="mt-4 rounded border border-red-500/30 bg-red-500/10 p-2 text-sm text-red-200"
-          >
-            {error}
-          </p>
-        )}
+            {error && (
+              <p
+                role="alert"
+                className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200"
+              >
+                {error}
+              </p>
+            )}
 
-        {success && (
-          <p className="mt-4 rounded border border-emerald-500/30 bg-emerald-500/10 p-2 text-sm text-emerald-200">
-            {success}
-          </p>
-        )}
+            {success && (
+              <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+                {success}
+              </p>
+            )}
 
-        <p className="mt-6 text-center text-sm text-slate-300">
-          Ja possui conta?{' '}
-          <Link to="/login" className="text-emerald-300 hover:underline">
-            Fazer login
-          </Link>
-        </p>
+            <p className="text-center text-sm text-[#c5b5e9]">
+              Ja possui conta?{' '}
+              <Link to="/login" className="text-[#d8b4fe] hover:underline">
+                Fazer login
+              </Link>
+            </p>
           </div>
         </div>
       </div>

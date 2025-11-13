@@ -1,3 +1,4 @@
+import { env } from '../../config/env';
 import { authClient } from './httpClient';
 
 export interface AccessPageSummary {
@@ -46,6 +47,7 @@ export interface AccessPage extends AccessPageSummary {
 export interface AccessProfile {
   id: string;
   supabaseUserId: string;
+  handle?: string | null;
   displayName?: string | null;
   avatarUrl?: string | null;
   userType?: AccessUserType | null;
@@ -82,10 +84,22 @@ export interface UpdateProfileUserTypePayload {
   userTypeId?: string | null;
 }
 
+const adminHeaders = {
+  'x-admin-key': env.adminApiKey,
+};
+
 export const accessControlApi = {
+  getProfile(supabaseUserId: string, signal?: AbortSignal) {
+    return authClient.get<AccessProfile>(`/auth/profiles/${supabaseUserId}`, {
+      auth: true,
+      headers: adminHeaders,
+      signal,
+    });
+  },
   listProfiles(signal?: AbortSignal) {
     return authClient.get<AccessProfile[]>('/auth/profiles', {
       auth: true,
+      headers: adminHeaders,
       signal,
     });
   },
@@ -104,6 +118,7 @@ export const accessControlApi = {
   listUserGroups(signal?: AbortSignal) {
     return authClient.get<AccessUserGroup[]>('/auth/user-groups', {
       auth: true,
+      headers: adminHeaders,
       signal,
     });
   },
@@ -111,12 +126,16 @@ export const accessControlApi = {
     return authClient.post<CreateUserGroupPayload, AccessUserGroup>(
       '/auth/user-groups',
       payload,
-      { auth: true }
+      {
+        auth: true,
+        headers: adminHeaders,
+      }
     );
   },
   listUserTypes(signal?: AbortSignal) {
     return authClient.get<AccessUserType[]>('/auth/user-types', {
       auth: true,
+      headers: adminHeaders,
       signal,
     });
   },
@@ -124,12 +143,16 @@ export const accessControlApi = {
     return authClient.post<CreateUserTypePayload, AccessUserType>(
       '/auth/user-types',
       payload,
-      { auth: true }
+      {
+        auth: true,
+        headers: adminHeaders,
+      }
     );
   },
   listPages(signal?: AbortSignal) {
     return authClient.get<AccessPage[]>('/auth/pages', {
       auth: true,
+      headers: adminHeaders,
       signal,
     });
   },
@@ -137,12 +160,16 @@ export const accessControlApi = {
     return authClient.post<CreatePagePayload, AccessPage>(
       '/auth/pages',
       payload,
-      { auth: true }
+      {
+        auth: true,
+        headers: adminHeaders,
+      }
     );
   },
   listUserTypePageRoles(signal?: AbortSignal) {
     return authClient.get<AccessPageRole[]>('/auth/user-type-page-roles', {
       auth: true,
+      headers: adminHeaders,
       signal,
     });
   },
@@ -150,12 +177,16 @@ export const accessControlApi = {
     return authClient.post<CreatePageRolePayload, AccessPageRole>(
       '/auth/user-type-page-roles',
       payload,
-      { auth: true }
+      {
+        auth: true,
+        headers: adminHeaders,
+      }
     );
   },
   deleteUserTypePageRole(id: string) {
     return authClient.delete<AccessPageRole>(`/auth/user-type-page-roles/${id}`, {
       auth: true,
+      headers: adminHeaders,
     });
   },
 };

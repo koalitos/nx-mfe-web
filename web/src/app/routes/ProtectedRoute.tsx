@@ -1,8 +1,7 @@
-import { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+export const ProtectedRoute = () => {
   const { isAuthenticated, isInitializing } = useAuth();
   const location = useLocation();
 
@@ -24,5 +23,5 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };

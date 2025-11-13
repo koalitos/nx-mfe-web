@@ -28,6 +28,7 @@ export interface AuthUserType {
 export interface AuthProfile {
   id: string;
   supabaseUserId: string;
+  handle?: string | null;
   displayName?: string | null;
   avatarUrl?: string | null;
   userType?: AuthUserType | null;

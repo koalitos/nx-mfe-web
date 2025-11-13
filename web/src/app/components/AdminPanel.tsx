@@ -1,11 +1,5 @@
-
-import {
-  FormEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+ï»¿import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import {
   accessControlApi,
   AccessPage,
@@ -13,8 +7,8 @@ import {
   AccessProfile,
   AccessUserGroup,
   AccessUserType,
-} from '../services/accessControlApi';
-import { HttpError } from '../services/httpClient';
+} from "../services/accessControlApi";
+import { HttpError } from "../services/httpClient";
 
 type GroupFormState = {
   name: string;
@@ -44,46 +38,44 @@ type RoleFormState = {
 };
 
 const defaultGroupForm: GroupFormState = {
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   isActive: true,
 };
 
 const defaultUserTypeForm: UserTypeFormState = {
-  name: '',
-  description: '',
-  userGroupId: '',
+  name: "",
+  description: "",
+  userGroupId: "",
   isActive: true,
 };
 
 const defaultPageForm: PageFormState = {
-  key: '',
-  name: '',
-  path: '',
-  description: '',
+  key: "",
+  name: "",
+  path: "",
+  description: "",
   isActive: true,
 };
 
 const defaultRoleForm: RoleFormState = {
-  userTypeId: '',
-  pageId: '',
-  role: '',
+  userTypeId: "",
+  pageId: "",
+  role: "",
 };
 
 const parseError = (error: unknown, fallback: string) => {
   if (error instanceof HttpError) {
-    const payloadMessage = (error.payload as { message?: string })?.message;
-    if (payloadMessage) {
-      return payloadMessage;
+    const message = (error.payload as { message?: string })?.message;
+    if (message) {
+      return message;
     }
   }
   return fallback;
 };
 
-const formatPath = (path?: string | null) => (path ? path : '—');
-
-const formatRole = (role?: string) => (role ? role : '—');
 export const AdminPanel = () => {
+  const { profile: currentProfile, refreshProfile } = useAuth();
   const [profiles, setProfiles] = useState<AccessProfile[]>([]);
   const [userGroups, setUserGroups] = useState<AccessUserGroup[]>([]);
   const [userTypes, setUserTypes] = useState<AccessUserType[]>([]);
@@ -106,28 +98,23 @@ export const AdminPanel = () => {
       }
       setErrorMessage(null);
       try {
-        const [
-          profilesResponse,
-          groupsResponse,
-          userTypesResponse,
-          pagesResponse,
-          rolesResponse,
-        ] = await Promise.all([
-          accessControlApi.listProfiles(),
-          accessControlApi.listUserGroups(),
-          accessControlApi.listUserTypes(),
-          accessControlApi.listPages(),
-          accessControlApi.listUserTypePageRoles(),
-        ]);
+        const [profilesData, groupsData, userTypesData, pagesData, rolesData] =
+          await Promise.all([
+            accessControlApi.listProfiles(),
+            accessControlApi.listUserGroups(),
+            accessControlApi.listUserTypes(),
+            accessControlApi.listPages(),
+            accessControlApi.listUserTypePageRoles(),
+          ]);
 
-        setProfiles(profilesResponse ?? []);
-        setUserGroups(groupsResponse ?? []);
-        setUserTypes(userTypesResponse ?? []);
-        setPages(pagesResponse ?? []);
-        setPageRoles(rolesResponse ?? []);
+        setProfiles(profilesData ?? []);
+        setUserGroups(groupsData ?? []);
+        setUserTypes(userTypesData ?? []);
+        setPages(pagesData ?? []);
+        setPageRoles(rolesData ?? []);
       } catch (error) {
         setErrorMessage(
-          parseError(error, 'Nao foi possivel carregar as configuracoes de acesso.')
+          parseError(error, "Nao foi possivel carregar as configuracoes de acesso.")
         );
       } finally {
         if (!options?.silent) {
@@ -161,7 +148,7 @@ export const AdminPanel = () => {
 
   const handleCreateGroup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPendingAction('create-group');
+    setPendingAction("create-group");
     setStatusMessage(null);
     setErrorMessage(null);
     try {
@@ -171,10 +158,10 @@ export const AdminPanel = () => {
         isActive: groupForm.isActive,
       });
       setGroupForm(defaultGroupForm);
-      setStatusMessage('Grupo criado com sucesso.');
+      setStatusMessage("Grupo criado com sucesso.");
       await loadAccessData({ silent: true });
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao criar grupo.'));
+      setErrorMessage(parseError(error, "Erro ao criar grupo."));
     } finally {
       setPendingAction(null);
     }
@@ -182,7 +169,7 @@ export const AdminPanel = () => {
 
   const handleCreateUserType = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPendingAction('create-user-type');
+    setPendingAction("create-user-type");
     setStatusMessage(null);
     setErrorMessage(null);
     try {
@@ -193,10 +180,10 @@ export const AdminPanel = () => {
         isActive: userTypeForm.isActive,
       });
       setUserTypeForm(defaultUserTypeForm);
-      setStatusMessage('Tipo de usuario criado.');
+      setStatusMessage("Tipo de usuario criado.");
       await loadAccessData({ silent: true });
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao criar tipo de usuario.'));
+      setErrorMessage(parseError(error, "Erro ao criar tipo de usuario."));
     } finally {
       setPendingAction(null);
     }
@@ -204,7 +191,7 @@ export const AdminPanel = () => {
 
   const handleCreatePage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPendingAction('create-page');
+    setPendingAction("create-page");
     setStatusMessage(null);
     setErrorMessage(null);
     try {
@@ -216,21 +203,22 @@ export const AdminPanel = () => {
         isActive: pageForm.isActive,
       });
       setPageForm(defaultPageForm);
-      setStatusMessage('Pagina registrada.');
+      setStatusMessage("Pagina registrada.");
       await loadAccessData({ silent: true });
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao registrar pagina.'));
+      setErrorMessage(parseError(error, "Erro ao registrar pagina."));
     } finally {
       setPendingAction(null);
     }
   };
+
   const handleCreateRole = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!roleForm.userTypeId || !roleForm.pageId || !roleForm.role) {
-      setErrorMessage('Selecione tipo, pagina e informe a role.');
+      setErrorMessage("Selecione um tipo, uma pagina e informe a role.");
       return;
     }
-    setPendingAction('create-role');
+    setPendingAction("create-role");
     setStatusMessage(null);
     setErrorMessage(null);
     try {
@@ -240,10 +228,10 @@ export const AdminPanel = () => {
         role: roleForm.role,
       });
       setRoleForm(defaultRoleForm);
-      setStatusMessage('Role vinculada com sucesso.');
+      setStatusMessage("Role vinculada com sucesso.");
       await loadAccessData({ silent: true });
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao criar role.'));
+      setErrorMessage(parseError(error, "Erro ao criar role."));
     } finally {
       setPendingAction(null);
     }
@@ -256,10 +244,10 @@ export const AdminPanel = () => {
     setErrorMessage(null);
     try {
       await accessControlApi.deleteUserTypePageRole(role.id);
-      setStatusMessage('Role removida.');
+      setStatusMessage("Role removida.");
       await loadAccessData({ silent: true });
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao remover role.'));
+      setErrorMessage(parseError(error, "Erro ao remover role."));
     } finally {
       setPendingAction(null);
     }
@@ -276,18 +264,22 @@ export const AdminPanel = () => {
     try {
       const updated = await accessControlApi.updateProfileUserType(
         profile.supabaseUserId,
-        {
-          userTypeId: userTypeId || null,
-        }
+        { userTypeId: userTypeId || null }
       );
       setProfiles((current) =>
         current.map((item) =>
           item.supabaseUserId === updated.supabaseUserId ? updated : item
         )
       );
-      setStatusMessage('Perfil atualizado.');
+      if (
+        currentProfile?.supabaseUserId &&
+        updated.supabaseUserId === currentProfile.supabaseUserId
+      ) {
+        await refreshProfile();
+      }
+      setStatusMessage("Perfil atualizado.");
     } catch (error) {
-      setErrorMessage(parseError(error, 'Erro ao atualizar perfil.'));
+      setErrorMessage(parseError(error, "Erro ao atualizar perfil."));
     } finally {
       setPendingAction(null);
     }
@@ -298,18 +290,19 @@ export const AdminPanel = () => {
   };
 
   return (
-    <div className="rounded-xl border border-amber-500/40 bg-slate-900/80 p-6 text-white shadow-2xl shadow-slate-900/50">
+    <div className="rounded-2xl border border-[#4d1d88]/50 bg-[#110020]/90 p-6 text-white shadow-2xl shadow-slate-900/40">
+      <div className="h-4" />
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-wide text-amber-300">
             Controle de acesso
           </p>
           <h2 className="text-2xl font-semibold">
-            Grupos, tipos, paginas e perfis
+            Perfis, grupos e paginas protegidas
           </h2>
           <p className="text-sm text-slate-300">
-            Configure grupos, vincule tipos de usuario e defina roles de acesso
-            por pagina.
+            Atualize perfis sincronizados, organize grupos e defina quais rotas
+            estao liberadas no frontend.
           </p>
         </div>
         <button
@@ -318,14 +311,14 @@ export const AdminPanel = () => {
           disabled={isLoading}
           className="inline-flex items-center justify-center rounded-md border border-amber-400/60 px-4 py-2 text-sm font-medium text-amber-100 transition hover:border-amber-300 hover:bg-amber-500/10 disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-500"
         >
-          {isLoading ? 'Carregando...' : 'Atualizar dados'}
+          {isLoading ? "Carregando..." : "Recarregar dados"}
         </button>
       </div>
 
       {errorMessage && (
         <p
           role="alert"
-          className="mt-4 rounded border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-200"
+          className="mt-4 rounded border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100"
         >
           {errorMessage}
         </p>
@@ -336,100 +329,118 @@ export const AdminPanel = () => {
           {statusMessage}
         </p>
       )}
+      <div className="h-4" />
 
       {isLoading ? (
-        <p className="mt-6 text-sm text-slate-300">
-          Buscando configuracoes atualizadas...
-        </p>
+        <p className="mt-6 text-sm text-slate-300">Sincronizando dados...</p>
       ) : (
-        <div className="mt-6 space-y-6">
-          <section className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">Perfis sincronizados</h3>
-                <p className="text-sm text-slate-300">
-                  Defina o tipo de usuario (e consequentemente o grupo) de cada
-                  perfil registrado.
-                </p>
-              </div>
-              <span className="text-sm text-slate-400">
-                {profiles.length} perfil(s)
-              </span>
-            </div>
+        <div className="mt-8 space-y-10">
+          <details className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5 space-y-4">
+            <summary className="cursor-pointer list-none rounded-xl border border-slate-800/70 bg-slate-900/70 p-4 focus:outline-none focus:ring-2 focus:ring-emerald-400/40">
+              <p className="text-xs uppercase tracking-widest text-slate-400">
+                Sessao 1
+              </p>
+              <h3 className="text-xl font-semibold text-white">
+                Perfis sincronizados (lista de usuarios)
+              </h3>
+              <p className="text-sm text-slate-300">
+                Use a coluna Tipo para mover usuarios entre grupos sem solicitar
+                um novo login.
+              </p>
+            </summary>
             {profiles.length === 0 ? (
-              <p className="mt-4 text-sm text-slate-300">
-                Nenhum perfil encontrado. Realize logins/registrations para
-                sincronizar.
+              <p className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300">
+                Nenhum perfil encontrado. Assim que usuarios fizerem login eles
+                aparecerao aqui.
               </p>
             ) : (
-              <div className="mt-4 space-y-3">
-                {sortedProfiles.map((profile) => {
-                  const userTypeId = profile.userType?.id ?? '';
-                  return (
-                    <div
-                      key={profile.supabaseUserId}
-                      className="flex flex-col gap-3 rounded border border-slate-800/80 bg-slate-900/70 p-3 lg:flex-row lg:items-center lg:justify-between"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold text-white">
-                          {profile.displayName ?? 'Sem nome'}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          {profile.supabaseUserId}
-                        </p>
-                        {profile.userType?.userGroup && (
-                          <p className="text-xs text-slate-300">
-                            Grupo:{' '}
-                            <span className="font-medium">
-                              {profile.userType.userGroup.name}
-                            </span>
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2 text-sm text-slate-200 lg:min-w-[240px]">
-                        <select
-                          value={userTypeId}
-                          onChange={(event) =>
-                            handleProfileUserTypeChange(
-                              profile,
-                              event.target.value
-                            )
-                          }
-                          className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-sm text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                          disabled={isBusy(`profile-${profile.supabaseUserId}`)}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800/70 bg-slate-950/40 p-2">
+                <table className="w-full text-left text-sm">
+                  <thead className="text-xs uppercase text-slate-400">
+                    <tr>
+                      <th className="px-4 py-3">Usuario</th>
+                      <th className="px-4 py-3">Grupo</th>
+                      <th className="px-4 py-3">Tipo</th>
+                      <th className="px-4 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedProfiles.map((profile) => {
+                      const busy = isBusy(`profile-${profile.supabaseUserId}`);
+                      const selectedTypeId = profile.userType?.id ?? "";
+                      return (
+                        <tr
+                          key={profile.supabaseUserId}
+                          className="border-t border-slate-800/60"
                         >
-                          <option value="">Sem tipo definido</option>
-                          {activeUserTypes.map((type) => (
-                            <option key={type.id} value={type.id}>
-                              {type.name}{' '}
-                              {type.userGroup
-                                ? `(${type.userGroup.name})`
-                                : ''}
-                            </option>
-                          ))}
-                        </select>
-                        {isBusy(`profile-${profile.supabaseUserId}`) && (
-                          <span className="text-xs text-amber-300">
-                            Atualizando...
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                          <td className="px-4 py-3">
+                            <div className="font-semibold text-white">
+                              {profile.displayName ?? "Sem nome"}
+                            </div>
+                            <p className="text-xs text-slate-400">
+                              {profile.supabaseUserId}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3 text-slate-200">
+                            {profile.userType?.userGroup?.name ?? "Nao definido"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <select
+                              value={selectedTypeId}
+                              onChange={(event) =>
+                                handleProfileUserTypeChange(
+                                  profile,
+                                  event.target.value
+                                )
+                              }
+                              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-sm text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                              disabled={busy}
+                            >
+                              <option value="">Sem tipo</option>
+                              {activeUserTypes.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                  {type.name}
+                                  {type.userGroup
+                                    ? ` (${type.userGroup.name})`
+                                    : ""}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-400">
+                            {busy ? "Aplicando..." : "Atualizado"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
-          </section>
-          <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Registrar grupo</h3>
-              <p className="text-sm text-slate-300">
-                Grupos agrupam tipos de usuarios com responsabilidades
-                semelhantes.
+          </details>
+
+          <details className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5 space-y-5">
+            <summary className="cursor-pointer list-none rounded-xl border border-slate-800/70 bg-slate-900/70 p-4 focus:outline-none focus:ring-2 focus:ring-emerald-400/40">
+              <p className="text-xs uppercase tracking-widest text-slate-400">
+                Sessao 2
               </p>
-              <form className="mt-4 space-y-4" onSubmit={handleCreateGroup}>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Nome</span>
+              <h3 className="text-xl font-semibold text-white">
+                Estrutura organizacional (grupos e tipos)
+              </h3>
+              <p className="text-sm text-slate-300">
+                Crie grupos para segmentar responsabilidades e associe tipos de
+                usuario.
+              </p>
+            </summary>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <form
+                className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
+                onSubmit={handleCreateGroup}
+              >
+                <h4 className="text-lg font-semibold text-white">Criar grupo</h4>
+                <label className="block text-sm text-slate-200">
+                  Nome
                   <input
                     required
                     value={groupForm.name}
@@ -439,13 +450,11 @@ export const AdminPanel = () => {
                         name: event.target.value,
                       }))
                     }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
                   />
                 </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Descricao (opcional)
-                  </span>
+                <label className="block text-sm text-slate-200">
+                  Descricao
                   <textarea
                     value={groupForm.description}
                     onChange={(event) =>
@@ -455,10 +464,10 @@ export const AdminPanel = () => {
                       }))
                     }
                     rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
                   />
                 </label>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-200">
+                <label className="flex items-center gap-2 text-sm text-slate-200">
                   <input
                     type="checkbox"
                     checked={groupForm.isActive}
@@ -468,28 +477,27 @@ export const AdminPanel = () => {
                         isActive: event.target.checked,
                       }))
                     }
-                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-amber-400 focus:ring-amber-400"
                   />
-                  Ativo para associacao
+                  Grupo ativo
                 </label>
                 <button
                   type="submit"
-                  disabled={isBusy('create-group')}
-                  className="w-full rounded-md bg-amber-400/90 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+                  disabled={isBusy("create-group")}
+                  className="w-full rounded-md bg-amber-400/80 py-2 text-sm font-semibold text-amber-950 disabled:cursor-not-allowed"
                 >
-                  {isBusy('create-group') ? 'Criando...' : 'Criar grupo'}
+                  {isBusy("create-group") ? "Criando..." : "Salvar grupo"}
                 </button>
               </form>
-            </div>
 
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Criar tipo de usuario</h3>
-              <p className="text-sm text-slate-300">
-                Tipos sao associados aos perfis e determinam o grupo e as roles.
-              </p>
-              <form className="mt-4 space-y-4" onSubmit={handleCreateUserType}>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Nome</span>
+              <form
+                className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
+                onSubmit={handleCreateUserType}
+              >
+                <h4 className="text-lg font-semibold text-white">
+                  Criar tipo de usuario
+                </h4>
+                <label className="block text-sm text-slate-200">
+                  Nome
                   <input
                     required
                     value={userTypeForm.name}
@@ -499,13 +507,11 @@ export const AdminPanel = () => {
                         name: event.target.value,
                       }))
                     }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
                   />
                 </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Descricao (opcional)
-                  </span>
+                <label className="block text-sm text-slate-200">
+                  Descricao
                   <textarea
                     value={userTypeForm.description}
                     onChange={(event) =>
@@ -515,11 +521,11 @@ export const AdminPanel = () => {
                       }))
                     }
                     rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
                   />
                 </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Grupo</span>
+                <label className="block text-sm text-slate-200">
+                  Grupo associado
                   <select
                     value={userTypeForm.userGroupId}
                     onChange={(event) =>
@@ -528,7 +534,7 @@ export const AdminPanel = () => {
                         userGroupId: event.target.value,
                       }))
                     }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
                   >
                     <option value="">Sem grupo</option>
                     {userGroups.map((group) => (
@@ -538,7 +544,7 @@ export const AdminPanel = () => {
                     ))}
                   </select>
                 </label>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-200">
+                <label className="flex items-center gap-2 text-sm text-slate-200">
                   <input
                     type="checkbox"
                     checked={userTypeForm.isActive}
@@ -548,247 +554,46 @@ export const AdminPanel = () => {
                         isActive: event.target.checked,
                       }))
                     }
-                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-amber-400 focus:ring-amber-400"
                   />
                   Tipo ativo
                 </label>
                 <button
                   type="submit"
-                  disabled={isBusy('create-user-type')}
-                  className="w-full rounded-md bg-amber-400/90 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+                  disabled={isBusy("create-user-type")}
+                  className="w-full rounded-md bg-amber-400/80 py-2 text-sm font-semibold text-amber-950 disabled:cursor-not-allowed"
                 >
-                  {isBusy('create-user-type') ? 'Registrando...' : 'Criar tipo'}
-                </button>
-              </form>
-            </div>
-          </section>
-          <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Paginas protegidas</h3>
-              <p className="text-sm text-slate-300">
-                Registre paginas para vincular roles.
-              </p>
-              <form className="mt-4 space-y-4" onSubmit={handleCreatePage}>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Chave (ex.: dashboard.home)
-                  </span>
-                  <input
-                    required
-                    value={pageForm.key}
-                    onChange={(event) =>
-                      setPageForm((prev) => ({
-                        ...prev,
-                        key: event.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Nome</span>
-                  <input
-                    required
-                    value={pageForm.name}
-                    onChange={(event) =>
-                      setPageForm((prev) => ({
-                        ...prev,
-                        name: event.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Path relativo
-                  </span>
-                  <input
-                    value={pageForm.path}
-                    onChange={(event) =>
-                      setPageForm((prev) => ({
-                        ...prev,
-                        path: event.target.value,
-                      }))
-                    }
-                    placeholder="/dashboard"
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Descricao (opcional)
-                  </span>
-                  <textarea
-                    value={pageForm.description}
-                    onChange={(event) =>
-                      setPageForm((prev) => ({
-                        ...prev,
-                        description: event.target.value,
-                      }))
-                    }
-                    rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  />
-                </label>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-200">
-                  <input
-                    type="checkbox"
-                    checked={pageForm.isActive}
-                    onChange={(event) =>
-                      setPageForm((prev) => ({
-                        ...prev,
-                        isActive: event.target.checked,
-                      }))
-                    }
-                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-amber-400 focus:ring-amber-400"
-                  />
-                  Pagina ativa
-                </label>
-                <button
-                  type="submit"
-                  disabled={isBusy('create-page')}
-                  className="w-full rounded-md bg-amber-400/90 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-                >
-                  {isBusy('create-page') ? 'Salvando...' : 'Registrar pagina'}
+                  {isBusy("create-user-type") ? "Salvando..." : "Salvar tipo"}
                 </button>
               </form>
             </div>
 
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Roles por pagina</h3>
-              <p className="text-sm text-slate-300">
-                Vincule tipos de usuario a paginas com uma role (viewer, editor,
-                etc).
-              </p>
-              <form className="mt-4 space-y-4" onSubmit={handleCreateRole}>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">
-                    Tipo de usuario
-                  </span>
-                  <select
-                    required
-                    value={roleForm.userTypeId}
-                    onChange={(event) =>
-                      setRoleForm((prev) => ({
-                        ...prev,
-                        userTypeId: event.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  >
-                    <option value="">Selecione</option>
-                    {userTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
-                        {type.userGroup ? ` (${type.userGroup.name})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Pagina</span>
-                  <select
-                    required
-                    value={roleForm.pageId}
-                    onChange={(event) =>
-                      setRoleForm((prev) => ({
-                        ...prev,
-                        pageId: event.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  >
-                    <option value="">Selecione</option>
-                    {pages.map((page) => (
-                      <option key={page.id} value={page.id}>
-                        {page.name} ({page.key})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-200">Role</span>
-                  <input
-                    required
-                    value={roleForm.role}
-                    onChange={(event) =>
-                      setRoleForm((prev) => ({
-                        ...prev,
-                        role: event.target.value,
-                      }))
-                    }
-                    placeholder="viewer, editor..."
-                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  disabled={isBusy('create-role')}
-                  className="w-full rounded-md bg-amber-400/90 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-                >
-                  {isBusy('create-role') ? 'Gravando...' : 'Vincular role'}
-                </button>
-              </form>
-              <div className="mt-6 space-y-3">
-                {pageRoles.length === 0 ? (
-                  <p className="text-sm text-slate-300">
-                    Nenhuma role cadastrada ainda.
-                  </p>
-                ) : (
-                  pageRoles.map((role) => (
-                    <div
-                      key={role.id}
-                      className="flex flex-col gap-2 rounded border border-slate-800/70 bg-slate-900/70 p-3 text-sm lg:flex-row lg:items-center lg:justify-between"
-                    >
-                      <div>
-                        <p className="font-semibold text-white">
-                          {role.userType?.name ?? 'Tipo removido'}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          Pagina: {role.page?.name ?? 'Indefinida'} (
-                          {role.page?.key ?? 'sem chave'})
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          Role: {formatRole(role.role)}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveRole(role)}
-                        disabled={isBusy(`delete-role-${role.id}`)}
-                        className="inline-flex items-center justify-center rounded border border-red-500/50 px-3 py-1 text-xs font-semibold text-red-200 transition hover:border-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-500"
-                      >
-                        {isBusy(`delete-role-${role.id}`) ? 'Removendo...' : 'Remover'}
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </section>
-          <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Grupos & tipos</h3>
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
+              <h4 className="text-lg font-semibold text-white">
+                Visao geral dos grupos
+              </h4>
               {userGroups.length === 0 ? (
-                <p className="text-sm text-slate-300">Nenhum grupo registrado.</p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Nenhum grupo cadastrado.
+                </p>
               ) : (
-                <div className="mt-3 space-y-3 text-sm">
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {userGroups.map((group) => (
                     <div
                       key={group.id}
-                      className="rounded border border-slate-800/70 bg-slate-900/70 p-3"
+                      className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm"
                     >
                       <p className="font-semibold text-white">{group.name}</p>
                       {group.description && (
-                        <p className="text-xs text-slate-300">{group.description}</p>
+                        <p className="text-xs text-slate-300">
+                          {group.description}
+                        </p>
                       )}
                       <p className="text-xs text-slate-400">
-                        {group.isActive ? 'Ativo' : 'Inativo'}
+                        {group.isActive ? "Ativo" : "Inativo"}
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {group.userTypes.length === 0 ? (
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-slate-500">
                             Sem tipos vinculados.
                           </span>
                         ) : (
@@ -807,51 +612,275 @@ export const AdminPanel = () => {
                 </div>
               )}
             </div>
+          </details>
 
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <h3 className="text-lg font-semibold">Paginas cadastradas</h3>
-              {pages.length === 0 ? (
-                <p className="text-sm text-slate-300">Nenhuma pagina registrada.</p>
-              ) : (
-                <div className="mt-3 space-y-3 text-sm">
-                  {pages.map((page) => (
-                    <div
-                      key={page.id}
-                      className="rounded border border-slate-800/70 bg-slate-900/70 p-3"
-                    >
-                      <p className="font-semibold text-white">
-                        {page.name} <span className="text-xs">({page.key})</span>
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        Path: {formatPath(page.path)}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {page.isActive ? 'Ativa' : 'Inativa'}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {page.roles.length === 0 ? (
-                          <span className="text-xs text-slate-400">
-                            Sem roles vinculadas.
-                          </span>
-                        ) : (
-                          page.roles.map((role) => (
-                            <span
-                              key={role.id}
-                              className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-200"
-                            >
-                              {role.userType?.name ?? 'Tipo removido'} — {role.role}
-                            </span>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <details className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5 space-y-5">
+            <summary className="cursor-pointer list-none rounded-xl border border-slate-800/70 bg-slate-900/70 p-4 focus:outline-none focus:ring-2 focus:ring-emerald-400/40">
+              <p className="text-xs uppercase tracking-widest text-slate-400">
+                Sessao 3
+              </p>
+              <h3 className="text-xl font-semibold text-white">
+                Paginas protegidas e roles
+              </h3>
+              <p className="text-sm text-slate-300">
+                Registre as paginas usadas no frontend e vincule cada uma a um
+                tipo de usuario com uma role.
+              </p>
+            </summary>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <form
+                className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
+                onSubmit={handleCreatePage}
+              >
+                <h4 className="text-lg font-semibold text-white">
+                  Registrar pagina
+                </h4>
+                <label className="block text-sm text-slate-200">
+                  Chave (ex: dashboard.home)
+                  <input
+                    required
+                    value={pageForm.key}
+                    onChange={(event) =>
+                      setPageForm((prev) => ({
+                        ...prev,
+                        key: event.target.value,
+                      }))
+                    }
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  />
+                </label>
+                <label className="block text-sm text-slate-200">
+                  Nome exibido
+                  <input
+                    required
+                    value={pageForm.name}
+                    onChange={(event) =>
+                      setPageForm((prev) => ({
+                        ...prev,
+                        name: event.target.value,
+                      }))
+                    }
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  />
+                </label>
+                <label className="block text-sm text-slate-200">
+                  Path relativo
+                  <input
+                    value={pageForm.path}
+                    onChange={(event) =>
+                      setPageForm((prev) => ({
+                        ...prev,
+                        path: event.target.value,
+                      }))
+                    }
+                    placeholder="/dashboard"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  />
+                </label>
+                <label className="block text-sm text-slate-200">
+                  Descricao
+                  <textarea
+                    value={pageForm.description}
+                    onChange={(event) =>
+                      setPageForm((prev) => ({
+                        ...prev,
+                        description: event.target.value,
+                      }))
+                    }
+                    rows={3}
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={pageForm.isActive}
+                    onChange={(event) =>
+                      setPageForm((prev) => ({
+                        ...prev,
+                        isActive: event.target.checked,
+                      }))
+                    }
+                  />
+                  Pagina ativa
+                </label>
+                <button
+                  type="submit"
+                  disabled={isBusy("create-page")}
+                  className="w-full rounded-md bg-amber-400/80 py-2 text-sm font-semibold text-amber-950 disabled:cursor-not-allowed"
+                >
+                  {isBusy("create-page") ? "Gravando..." : "Salvar pagina"}
+                </button>
+              </form>
+
+              <form
+                className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
+                onSubmit={handleCreateRole}
+              >
+                <h4 className="text-lg font-semibold text-white">
+                  Vincular role
+                </h4>
+                <label className="block text-sm text-slate-200">
+                  Tipo de usuario
+                  <select
+                    required
+                    value={roleForm.userTypeId}
+                    onChange={(event) =>
+                      setRoleForm((prev) => ({
+                        ...prev,
+                        userTypeId: event.target.value,
+                      }))
+                    }
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  >
+                    <option value="">Selecione</option>
+                    {userTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                        {type.userGroup ? ` (${type.userGroup.name})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-slate-200">
+                  Pagina
+                  <select
+                    required
+                    value={roleForm.pageId}
+                    onChange={(event) =>
+                      setRoleForm((prev) => ({
+                        ...prev,
+                        pageId: event.target.value,
+                      }))
+                    }
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  >
+                    <option value="">Selecione</option>
+                    {pages.map((page) => (
+                      <option key={page.id} value={page.id}>
+                        {page.name} ({page.key})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-slate-200">
+                  Role (ex: viewer, editor)
+                  <input
+                    required
+                    value={roleForm.role}
+                    onChange={(event) =>
+                      setRoleForm((prev) => ({
+                        ...prev,
+                        role: event.target.value,
+                      }))
+                    }
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-800 p-2 text-white"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={isBusy("create-role")}
+                  className="w-full rounded-md bg-amber-400/80 py-2 text-sm font-semibold text-amber-950 disabled:cursor-not-allowed"
+                >
+                  {isBusy("create-role") ? "Vinculando..." : "Salvar role"}
+                </button>
+              </form>
             </div>
-          </section>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
+                <h4 className="text-lg font-semibold text-white">
+                  Roles cadastradas
+                </h4>
+                {pageRoles.length === 0 ? (
+                  <p className="mt-3 text-sm text-slate-300">
+                    Nenhuma role definida.
+                  </p>
+                ) : (
+                  <div className="mt-4 space-y-3">
+                    {pageRoles.map((role) => (
+                      <div
+                        key={role.id}
+                        className="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm md:flex-row md:items-center md:justify-between"
+                      >
+                        <div>
+                          <p className="font-semibold text-white">
+                            {role.userType?.name ?? "Tipo removido"}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            Pagina: {role.page?.name ?? "Indefinida"} (
+                            {role.page?.key ?? "sem chave"})
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            Role: {role.role || "N/A"}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRole(role)}
+                          disabled={isBusy(`delete-role-${role.id}`)}
+                          className="rounded-md border border-red-500/40 px-3 py-1 text-xs font-semibold text-red-200 transition hover:border-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed"
+                        >
+                          {isBusy(`delete-role-${role.id}`) ? "Removendo..." : "Remover"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
+                <h4 className="text-lg font-semibold text-white">
+                  Paginas registradas
+                </h4>
+                {pages.length === 0 ? (
+                  <p className="mt-3 text-sm text-slate-300">
+                    Nenhuma pagina registrada.
+                  </p>
+                ) : (
+                  <div className="mt-4 space-y-3 text-sm">
+                    {pages.map((page) => (
+                      <div
+                        key={page.id}
+                        className="rounded-xl border border-slate-800 bg-slate-900/70 p-3"
+                      >
+                        <p className="font-semibold text-white">
+                          {page.name}{" "}
+                          <span className="text-xs text-slate-400">({page.key})</span>
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          Path: {page.path ?? "Nao definido"}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {page.isActive ? "Ativa" : "Inativa"}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {page.roles.length === 0 ? (
+                            <span className="text-xs text-slate-500">
+                              Sem roles vinculadas.
+                            </span>
+                          ) : (
+                            page.roles.map((role) => (
+                              <span
+                                key={role.id}
+                                className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-200"
+                              >
+                                {role.userType?.name ?? "Tipo removido"} - {role.role}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </details>
         </div>
       )}
     </div>
   );
-};
+}
+

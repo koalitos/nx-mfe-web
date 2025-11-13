@@ -28,6 +28,7 @@ const ensure = (key: keyof ImportMetaEnv, fallback?: string) => {
 };
 
 const supabaseChannel = ensure('VITE_SUPABASE_REALTIME_CHANNEL', 'calculations');
+const adminApiKey = ensure('VITE_ADMIN_API_KEY');
 
 if (typeof console !== 'undefined') {
   console.log('[env] VITE_SUPABASE_REALTIME_CHANNEL:', supabaseChannel);
@@ -39,4 +40,5 @@ export const env = {
   apiBaseUrl: ensure('VITE_API_BASE_URL', 'http://localhost:3000'),
   authBaseUrl: ensure('VITE_AUTH_BASE_URL', 'http://localhost:3001'),
   supabaseChannel,
+  adminApiKey,
 };
