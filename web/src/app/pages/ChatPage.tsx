@@ -1,14 +1,3 @@
-
-  useEffect(() => {
-    if (!selectedRoomIdentifier || notifications.length === 0) {
-      return;
-    }
-    const latest = notifications[0];
-    const data = (latest.data ?? {}) as any;
-    if (latest.category === 'chat' && data.roomId === selectedRoomIdentifier && data.message) {
-      appendMessage(data.message as ChatMessage);
-    }
-  }, [notifications, selectedRoomIdentifier, appendMessage]);
 import {
   FormEvent,
   useCallback,
@@ -17,7 +6,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { RealtimeChannel } from '@supabase/supabase-js';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import {
@@ -82,7 +70,7 @@ const getPeerParticipant = (
 export const ChatPage = () => {
   const { canAccessPage, profile, user } = useAuth();
   const allowed = canAccessPage('dashboard.chat');
-  const { subscribeRoom } = useNotifications();
+  const { subscribeRoom, notifications } = useNotifications();
   const [searchParams, setSearchParams] = useSearchParams();
   const roomQuery = searchParams.get('room');
 
@@ -129,9 +117,7 @@ export const ChatPage = () => {
 
   const selectedRoomIdentifier = selectedRoom?.id ?? selectedRoomId;
   const selectedRoomType = selectedRoom?.type ?? null;
-  
-  // Listen to global notifications for realtime updates
-  const { notifications } = useNotifications();
+  const selectedDirectHandle = selectedRoomType === 'DIRECT' ? directPeer?.handle ?? null : null;
 
   const getRoomDisplayName = useCallback(
     (room: ChatRoomSummary) => {
@@ -203,6 +189,21 @@ export const ChatPage = () => {
       )
     );
   }, []);
+  useEffect(() => {
+    if (!selectedRoomIdentifier || notifications.length === 0) {
+      return;
+    }
+    const latest = notifications[0];
+    const data = (latest.data ?? {}) as any;
+    if (
+      latest.category === 'chat' &&
+      data.roomId === selectedRoomIdentifier &&
+      data.message
+    ) {
+      appendMessage(data.message as ChatMessage);
+    }
+  }, [notifications, selectedRoomIdentifier, appendMessage]);
+
 
   useEffect(() => {
     if (!allowed) {
@@ -716,6 +717,9 @@ const SectionChannels = ({
     )}
   </div>
 );
+
+
+
 
 
 
